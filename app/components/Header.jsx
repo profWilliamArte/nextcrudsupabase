@@ -1,10 +1,10 @@
-
-
+import Image from 'next/image';
+import logo from "../../public/logo.png"
 const Header = () => {
     return (
         <nav className="navbar navbar-expand-lg bg-black" data-bs-theme="dark">
             <div className="container-fluid">
-                <a className="navbar-brand" href="#">Navbar</a>
+                <a className="navbar-brand" href="#"><Image src={logo} alt="" width={150} /></a>
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span className="navbar-toggler-icon" />
                 </button>
@@ -31,7 +31,7 @@ const Header = () => {
                             </ul>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link disabled" aria-disabled="true">Disabled</a>
+                            <a className="nav-link" href="/tareas">Tareas</a>
                         </li>
                     </ul>
                     <form className="d-flex" role="search">
