@@ -1,18 +1,16 @@
-'use client'; // Asegúrate de tener esta directiva al inicio del archivo
+'use client';
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation"; // Importa useRouter desde next/navigation
-import { supabase } from "../../../libs/supabase"; // Ajusta la ruta según tu estructura de carpetas
+import { useRouter } from "next/navigation";
+import { supabase } from "../../../libs/supabase";
 
 const PageEditarTarea = ({ params }) => {
     const router = useRouter();
-    const { id } = params; // Obtener el ID del
-    const [tarea, setTarea] = useState("")
-    const [message, setMessage] = useState("");
-    const [datos, setDatos] = useState(null);
+    const { id } = params; // Obtener el ID directamente de params
+    const [tarea, setTarea] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const [showSuccessMessage, setShowSuccessMessage] = useState(false); // Nuevo estado para mostrar el mensaje de actualización exitosa
+    const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
     useEffect(() => {
         const fetchTarea = async () => {
@@ -24,9 +22,8 @@ const PageEditarTarea = ({ params }) => {
                     .single();
 
                 if (error) {
-                    setError("Error al cargar el producto: " + error.message);
+                    setError("Error al cargar la tarea: " + error.message);
                 } else {
-                    setDatos(data);
                     setTarea(data.tarea);
                 }
                 setLoading(false);
@@ -34,32 +31,43 @@ const PageEditarTarea = ({ params }) => {
         };
         fetchTarea();
     }, [id]);
+
     const manejoTarea = (e) => {
-        setTarea(e.target.value)
-        //console.log(tarea)
-    }
+        setTarea(e.target.value);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError("");
-        const { error } = await supabase
-            .from("todo")
-            .update({
-                tarea  
-            })
-            .eq('id', id);
-        if (error) {
-            setError("Error al actualizar el la tarea: " + error.message);
-        } else {
-            setShowSuccessMessage(true); // Mostrar el mensaje de éxito
-            setTimeout(() => {
-                router.push('/tareas'); // Redirigir a la lista de tareas
-            }, 300);
+
+        try {
+            const { error } = await supabase
+                .from("todo")
+                .update({ tarea })
+                .eq('id', id);
+
+            if (error) {
+                setError("Error al actualizar la tarea: " + error.message);
+            } else {
+                setShowSuccessMessage(true);
+                setTimeout(() => {
+                    router.push('/tareas');
+                }, 2000);
+            }
+        } catch (error) {
+            setError("Error al actualizar la tarea: " + error.message);
         }
         setLoading(false);
     };
 
-    if (loading) return <p>Cargando producto...</p>;
+    if (loading) {
+        return <div className="text-center">Cargando tarea...</div>;
+    }
+
+    if (error) {
+        return <div className="text-center text-danger">{error}</div>;
+    }
 
     return (
         <div className="container">
@@ -67,19 +75,40 @@ const PageEditarTarea = ({ params }) => {
             <div className="row">
                 <div className="col-md-6 mx-auto">
                     <div className="card" data-bs-theme="dark">
-                        <form onSubmit={handleSubmit} >
+                        <form onSubmit={handleSubmit}>
                             <div className="card-header">
                                 <div className="mb-3">
-                                    <label htmlFor="tarea" className="form-label">Tarea</label>
-                                    <textarea className="form-control" value={tarea} placeholder="indique la tarea" id="tarea" rows="4" onChange={manejoTarea} required></textarea>
+                                    <label htmlFor="tarea" className="form-label">
+                                        Tarea
+                                    </label>
+                                    <textarea
+                                        className="form-control"
+                                        value={tarea}
+                                        placeholder="Indique la tarea"
+                                        id="tarea"
+                                        rows="4"
+                                        onChange={manejoTarea}
+                                        required
+                                    ></textarea>
                                 </div>
                             </div>
                             <div className="card-footer text-center">
-                                <button type="submit" className="btn btn-outline-success">
-                                    {params.id ? "Actualizar" : "Crear"}
+                                <button
+                                    type="submit"
+                                    className="btn btn-outline-success"
+                                    disabled={loading}
+                                >
+                                    {loading ? "Actualizando..." : "Actualizar"}
                                 </button>
-                                {message && (
-                                    <div className="alert alert-info mt-3">{message}</div>
+                                {error && (
+                                    <div className="alert alert-danger mt-3">
+                                        {error}
+                                    </div>
+                                )}
+                                {showSuccessMessage && (
+                                    <div className="alert alert-success mt-3">
+                                        Tarea actualizada exitosamente. Redirigiendo...
+                                    </div>
                                 )}
                             </div>
                         </form>
@@ -87,7 +116,7 @@ const PageEditarTarea = ({ params }) => {
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default PageEditarTarea
+export default PageEditarTarea;
