@@ -5,7 +5,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { useRouter } from 'next/navigation';
 
-const page = ({params}) => {
+const Page = ({params}) => {
     const router = useRouter(); // Usa useRouter aquí
     const [datos, setDatos] = useState([]);
     const [loading, setLoading] = useState(true);
